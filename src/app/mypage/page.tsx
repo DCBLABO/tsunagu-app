@@ -13,6 +13,9 @@ export default function MyPage() {
         <div className="mt-6">
           <ButtonLink href="/">今日の一歩へ戻る</ButtonLink>
         </div>
+        <p className="mt-6 text-center text-xs text-stone-400">
+          運営の方へ：<a className="underline" href="/admin">バックヤード（テーマ設定）</a>
+        </p>
       </section>
     </AppShell>
   );
