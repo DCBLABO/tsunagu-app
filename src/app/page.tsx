@@ -1,54 +1,67 @@
 "use client";
 
+import { useMemo, useState } from "react";
+import { ActionMessage } from "@/components/ActionMessage";
 import { AppShell } from "@/components/AppShell";
-import { ButtonLink } from "@/components/ButtonLink";
-import { useCommunity } from "@/data/CommunityProvider";
+import { CopyBox } from "@/components/CopyBox";
 import { useRecords } from "@/data/RecordsProvider";
+import { buildChappyPrompt, buildChappySetupPrompt } from "@/lib/shareText";
 
-// みんなの振り返りが集まる掲示板。
-// 今はこのブラウザの中だけのモック表示だが、将来バックエンドを繋いだときに
-// 本当の意味で「TSUNAGU DAOみんなの掲示板」になり、ここに集まった声がクロードの学習データにもつながっていく。
-export default function CommunityPage() {
-  const { posts } = useCommunity();
-  const { latestRecord } = useRecords();
+export default function ChappyPage() {
+  const { today } = useRecords();
+  const [message, setMessage] = useState("");
+  const [setupMessage, setSetupMessage] = useState("");
+  const prompt = useMemo(() => buildChappyPrompt(today), [today]);
+  const setupPrompt = useMemo(() => buildChappySetupPrompt(), []);
+
+  async function handleCopyAndOpen() {
+    await navigator.clipboard.writeText(prompt);
+    setMessage("プロンプトをコピーしました。ChatGPTに貼り付けて送信してください。");
+    window.open("https://chatgpt.com/", "_blank", "noopener,noreferrer");
+  }
+
+  async function handleCopySetup() {
+    await navigator.clipboard.writeText(setupPrompt);
+    setSetupMessage("初期設定プロンプトをコピーしました。新しいチャットの一番最初に貼り付けてください。");
+  }
 
   return (
     <AppShell>
-      <div className="mb-6 space-y-3">
-        <p className="font-bold text-orange-700">🤝 みんなの掲示板</p>
-        <h1 className="text-3xl font-bold text-stone-950">仲間の5分振り返り</h1>
-        <p className="leading-7 text-stone-700">
-          同じテーマで悩んでいる仲間の気づきが、あなたの一歩の後押しになるかもしれません。あなたの振り返りも、誰かの支えになります。
-        </p>
-        {latestRecord ? (
-          <ButtonLink href={`/share/new?id=${latestRecord.id}`}>自分の振り返りをシェアする</ButtonLink>
-        ) : (
-          <ButtonLink href="/reflection/new">まずは今日の振り返りを書く</ButtonLink>
-        )}
-      </div>
-
-      {posts.length ? (
-        <div className="grid gap-4">
-          {posts.map((post) => (
-            <article key={post.id} className="warm-panel rounded-lg p-5">
-              <div className="mb-3 flex flex-wrap items-center gap-2 text-sm">
-                <span className="rounded-full bg-orange-100 px-3 py-1 font-bold text-orange-800">{post.theme}</span>
-                <span className="font-bold text-stone-700">{post.nickname}</span>
-                <span className="text-stone-500">{post.createdAt.slice(0, 10)}</span>
-              </div>
-              <p className="leading-7 text-stone-800">{post.message}</p>
-              {post.tomorrowAction ? (
-                <p className="mt-3 rounded-lg bg-amber-50 p-3 text-sm leading-6 text-stone-700">
-                  <span className="font-bold text-amber-800">明日の一歩：</span>
-                  {post.tomorrowAction}
-                </p>
-              ) : null}
-            </article>
-          ))}
+      <div className="space-y-5">
+        <div>
+          <p className="font-bold text-orange-700">🌱 チャッピーと話す</p>
+          <h1 className="mt-1 text-3xl font-bold text-stone-950">今日の問いをコピーする</h1>
+          <p className="mt-3 leading-7 text-stone-700">
+            ボタンを押すと今日の問いがコピーされ、あなたのChatGPT（チャッピー）が開きます。開いた画面にそのまま貼り付けて送信してください。今日のテーマについて話すか、今の気分から話すか、チャッピーが最初に聞いてくれます。対話が終わったら「まとめを保存する」にその内容を貼り付けましょう。
+          </p>
         </div>
-      ) : (
-        <div className="warm-panel rounded-lg p-5 text-stone-700">まだ投稿がありません。最初のシェアをしてみませんか？</div>
-      )}
+
+        <button
+          type="button"
+          onClick={handleCopyAndOpen}
+          className="w-full rounded-full bg-orange-500 px-5 py-4 font-bold text-white shadow-lg shadow-orange-200 transition hover:bg-orange-600"
+        >
+          プロンプトをコピーしてChatGPTを開く
+        </button>
+        {message ? <ActionMessage>{message}</ActionMessage> : null}
+
+        <CopyBox label="ChatGPT用プロンプト" text={prompt} />
+
+        <div className="warm-panel rounded-lg p-5">
+          <p className="font-bold text-orange-700">⚙️ 初めての方・新しいチャットのとき</p>
+          <p className="mt-2 text-sm leading-6 text-stone-700">
+            チャッピーに人間力向上委員会の理念やスタンスを覚えてもらうための初期設定です。新しくChatGPTのチャットを始めたときは、上のプロンプトより先に、まずこちらを貼り付けてください。一度設定した会話を続けて使う場合は、毎回貼り付ける必要はありません。
+          </p>
+          <button
+            type="button"
+            onClick={handleCopySetup}
+            className="mt-4 w-full rounded-full border border-orange-200 bg-white px-5 py-3 font-bold text-orange-800 transition hover:bg-orange-50"
+          >
+            初期設定プロンプトをコピー
+          </button>
+          {setupMessage ? <ActionMessage>{setupMessage}</ActionMessage> : null}
+        </div>
+      </div>
     </AppShell>
   );
 }
