@@ -14,11 +14,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-20 border-b border-orange-200/60 bg-[#fff8ed]/95 backdrop-blur">
         <div className="mx-auto flex max-w-3xl flex-col gap-3 px-4 py-4">
           <Link href="/" className="flex items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-full bg-orange-500 font-bold text-white shadow-lg shadow-orange-200">
-              繋
-            </span>
             <span>
-              <span className="block text-sm text-orange-700">TSUNAGU DAO</span>
+              <span className="block text-sm text-orange-700">TSUNAGU ら！</span>
               <span className="block font-bold text-stone-900">人間力向上委員会</span>
             </span>
           </Link>
