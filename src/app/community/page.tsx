@@ -10,7 +10,7 @@ import { buildCommunityReviewPrompt } from "@/lib/shareText";
 
 // みんなの振り返りが集まる掲示板。
 // 今はこのブラウザの中だけのモック表示だが、将来バックエンドを繋いだときに
-// 本当の意味で「TSUNAGU DAOみんなの掲示板」になり、ここに集まった声がクロードの学習データにもつながっていく。
+// 本当の意味で「TSUNAGU ら！みんなの掲示板」になり、ここに集まった声がクロードの学習データにもつながっていく。
 export default function CommunityPage() {
   const { posts } = useCommunity();
   const { latestRecord } = useRecords();
